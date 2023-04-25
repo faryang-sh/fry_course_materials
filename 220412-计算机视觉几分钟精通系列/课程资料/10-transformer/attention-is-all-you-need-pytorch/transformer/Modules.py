@@ -15,12 +15,15 @@ class ScaledDotProductAttention(nn.Module):
 
     def forward(self, q, k, v, mask=None):
 
+        # q乘以k的转置
         attn = torch.matmul(q / self.temperature, k.transpose(2, 3))
 
         if mask is not None:
             attn = attn.masked_fill(mask == 0, -1e9)
 
+            # 进行softmax
         attn = self.dropout(F.softmax(attn, dim=-1))
+        # 乘以 v
         output = torch.matmul(attn, v)
 
         return output, attn
